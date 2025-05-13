@@ -24,10 +24,10 @@ const requiredEnvVars = {
   BROWSERBASE_PROJECT_ID: process.env.BROWSERBASE_PROJECT_ID,
 };
 
-// Validate required environment variables
-Object.entries(requiredEnvVars).forEach(([name, value]) => {
-  if (!value) throw new Error(`${name} environment variable is required`);
-});
+// // Validate required environment variables
+// Object.entries(requiredEnvVars).forEach(([name, value]) => {
+//   if (!value) throw new Error(`${name} environment variable is required`);
+// });
 
 export async function createServer(config: Config): Promise<Server> {
   // Create the server
