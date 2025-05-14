@@ -91,7 +91,8 @@ async function handleSSE(req: http.IncomingMessage, res: http.ServerResponse, ur
   res.end('Method not allowed');
 }
 
-async function handleStreamable(req: http.IncomingMessage, res: http.ServerResponse, url: URL, serverList: ServerList, sessions: Map<string, StreamableHTTPServerTransport>) {
+// Export for remote
+export async function handleStreamable(req: http.IncomingMessage, res: http.ServerResponse, url: URL, serverList: ServerList, sessions: Map<string, StreamableHTTPServerTransport>) {
   const sessionId = req.headers['mcp-session-id'] as string | undefined;
   if (sessionId) {
     const transport = sessions.get(sessionId);

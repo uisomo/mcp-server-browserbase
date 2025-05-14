@@ -23,7 +23,10 @@
     "prepare": "npm run build",
     "watch": "tsc --watch",
     "inspector": "npx @modelcontextprotocol/inspector build/index.js",
-    "test-local": "npm pack && npm install -g $(pwd)/$(ls -t *.tgz | head -1) && mcp-server-browserbase"
+    "test-local": "npm pack && npm install -g $(pwd)/$(ls -t *.tgz | head -1) && mcp-server-browserbase",
+    "start": "node cli.js",
+    "dev": "vercel dev",
+    "deploy": "vercel deploy --prod"
   },
   "exports": {
     "./package.json": "./package.json",
@@ -34,7 +37,7 @@
   },
   "dependencies": {
     "@browserbasehq/sdk": "^2.5.0",
-    "@modelcontextprotocol/sdk": "^1.10.2",
+    "@modelcontextprotocol/sdk": "latest",
     "@types/yaml": "^1.9.6",
     "commander": "^13.1.0",
     "dotenv": "^16.5.0",
@@ -46,7 +49,8 @@
   },
   "devDependencies": {
     "shx": "^0.3.4",
-    "typescript": "^5.6.2"
+    "typescript": "^5.6.2",
+    "vercel": "latest"
   },
   "bin": {
     "mcp-server-browserbase": "cli.js"
