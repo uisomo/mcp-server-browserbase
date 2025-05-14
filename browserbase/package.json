@@ -24,9 +24,7 @@
     "watch": "tsc --watch",
     "inspector": "npx @modelcontextprotocol/inspector build/index.js",
     "test-local": "npm pack && npm install -g $(pwd)/$(ls -t *.tgz | head -1) && mcp-server-browserbase",
-    "start": "node cli.js",
-    "dev": "vercel dev",
-    "deploy": "vercel deploy --prod"
+    "start": "node cli.js"
   },
   "exports": {
     "./package.json": "./package.json",
