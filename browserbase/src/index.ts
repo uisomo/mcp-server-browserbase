@@ -18,21 +18,10 @@ import { z } from "zod";
 import { zodToJsonSchema } from "zod-to-json-schema";
 import { Context } from "./context.js";
 
-// Environment variables configuration
-const requiredEnvVars = {
-  BROWSERBASE_API_KEY: process.env.BROWSERBASE_API_KEY,
-  BROWSERBASE_PROJECT_ID: process.env.BROWSERBASE_PROJECT_ID,
-};
-
-// // Validate required environment variables
-// Object.entries(requiredEnvVars).forEach(([name, value]) => {
-//   if (!value) throw new Error(`${name} environment variable is required`);
-// });
-
 export async function createServer(config: Config): Promise<Server> {
   // Create the server
   const server = new Server(
-    { name: "mcp-server-browserbase", version: "0.5.1" },
+    { name: "mcp-server-browserbase", version: "1.0.5" },
     {
       capabilities: {
         resources: { list: true, read: true },
