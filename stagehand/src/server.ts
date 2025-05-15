@@ -26,6 +26,19 @@ import {
   listResourceTemplates,
   readResource,
 } from "./resources.js";
+import * as chromeLauncher from "chrome-launcher";
+
+export async function launchChromiumAndGetCDPUrl(): Promise<string> {
+  const chrome = await chromeLauncher.launch({
+    // chromeFlags: ["--headless", "--disable-gpu"],
+  });
+  if (!chrome.port) {
+    throw new Error("Failed to launch Chromium");
+  }
+  // The CDP URL is typically at http://localhost:<port>
+  const cdpUrl = `http://localhost:${chrome.port}`;
+  return cdpUrl;
+}
 
 // Define Stagehand configuration
 export const stagehandConfig: ConstructorParams = {
@@ -62,9 +75,9 @@ export const stagehandConfig: ConstructorParams = {
   enableCaching: true /* Enable caching functionality */,
   browserbaseSessionID:
     undefined /* Session ID for resuming Browserbase sessions */,
-  modelName: "gpt-4o" /* Name of the model to use */,
+  modelName: "gemini-2.0-flash" /* Name of the model to use */,
   modelClientOptions: {
-    apiKey: process.env.OPENAI_API_KEY,
+    apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
   } /* Configuration options for the model client */,
   useAPI: false,
 };
@@ -78,9 +91,10 @@ export async function ensureStagehand() {
     stagehandConfig.env === "LOCAL" &&
     !stagehandConfig.localBrowserLaunchOptions?.cdpUrl
   ) {
-    throw new Error(
-      'Using a local browser without providing a CDP URL is not supported. Please provide a CDP URL using the LOCAL_CDP_URL environment variable.\n\nTo launch your browser in "debug", see our documentation.\n\nhttps://docs.stagehand.dev/examples/customize_browser#use-your-personal-browser'
-    );
+    const cdpUrl = await launchChromiumAndGetCDPUrl();
+    stagehandConfig.localBrowserLaunchOptions = {
+      cdpUrl,
+    };
   }
 
   try {
