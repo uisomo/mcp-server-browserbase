@@ -7,11 +7,9 @@ import { startHttpTransport, startStdioTransport } from './transport.js';
 
 import { resolveConfig } from './config.js';
 
-import packageJSON from '../package.json' with { type: 'json' };
-
 program
-    .version('Version ' + packageJSON.version)
-    .name(packageJSON.name)
+    .version('1.0.5')
+    .name('Browserbase MCP Server')
     .option('--browserbaseApiKey <key>', 'The Browserbase API Key to use')
     .option('--browserbaseProjectId <id>', 'The Browserbase Project ID to use')
     .option('--proxies', 'Use Browserbase proxies.')
