@@ -3,10 +3,16 @@ import { z } from "zod";
 
 // @ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { Tool, navigate, common, snapshot, keyboard, getText, session, contextTools, Context, defaultConfig, resolveConfig} from "@mcp/core";
+import { Tool, navigate, common, snapshot, keyboard, getText, session, contextTools, Context, resolveConfig} from "@mcp/core";
 import { withMcpAuth } from "@/lib/auth";
+import { contextStore } from "@/lib/contextStore";
 
-const contextMap = new Map<string, Context>();
+const needAuthTools = [
+  "browserbase_session_create",
+  "browserbase_session_close",
+  "browserbase_context_create",
+  "browserbase_context_delete",
+];
 
 const mcpServerFactory = (req: Request) => async (server: any) => {
   const tools: Tool<any>[] = [
@@ -33,35 +39,40 @@ const mcpServerFactory = (req: Request) => async (server: any) => {
 
           const browserbaseApiKey = req.headers.get("x-api-key");
           const browserbaseProjectId = req.headers.get("x-project-id");
-          const contextId = req.headers.get("x-context-id");
+          let requestConfig;
 
-          const requestConfig = await resolveConfig({
-            browserbaseApiKey,
-            browserbaseProjectId,
-            proxies: req.headers.get("x-proxies") === "true",
-            browserSettings: {
-              viewport: {
-                width: req.headers.get("x-browser-width") ?? 1024,
-                height: req.headers.get("x-browser-height") ?? 768,
-              },
-              context: req.headers.get("x-context-id") ? {
-                id: req.headers.get("x-context-id"),
-                persist: req.headers.get("x-persist") === "true",
-              } : undefined,
-              advancedStealth: req.headers.get("x-advanced-stealth") === "true",
-            }
-          });
+          if(needAuthTools.includes(tool.schema.name)) {
+            requestConfig = await resolveConfig({
+              browserbaseApiKey,
+              browserbaseProjectId,
+              proxies: req.headers.get("x-proxies") === "true",
+              browserSettings: {
+                viewport: {
+                  width: req.headers.get("x-browser-width") ?? 1024,
+                  height: req.headers.get("x-browser-height") ?? 768,
+                },
+                context: req.headers.get("x-context-id") ? {
+                  id: req.headers.get("x-context-id"),
+                  persist: req.headers.get("x-persist") === "true",
+                } : undefined,
+                advancedStealth: req.headers.get("x-advanced-stealth") === "true",
+              }
+            });
+          }
 
-          const contextKey = `${browserbaseProjectId}:${contextId || 'default'}`;
+          const contextKey = `mcp:context:${browserbaseProjectId}`;
           
           let callContext: Context;
-          if (contextMap.has(contextKey)) {
-            callContext = contextMap.get(contextKey)!;
+          
+          if (await contextStore.has(contextKey)) {
+            callContext = await contextStore.get(contextKey);
             console.log(`Reusing existing context for ${contextKey}`);
-            callContext.config = requestConfig;
+            if(needAuthTools.includes(tool.schema.name)) {
+              callContext.config = requestConfig;
+            }
           } else {
             callContext = new Context(server, requestConfig);
-            contextMap.set(contextKey, callContext);
+            await contextStore.set(contextKey, callContext);
             console.log(`Created new context for ${contextKey}`);
           }
           
@@ -98,7 +109,7 @@ const mcpHandlerInstance = (req: Request) => {
       }
     },
     {
-      redisUrl: process.env.REDIS_URL,
+      // redisUrl: process.env.REDIS_URL, (only needed for SSE)
       basePath: "",
       verboseLogs: true,
       maxDuration: 60,

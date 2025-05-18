@@ -14,7 +14,7 @@ import {
 } from "@modelcontextprotocol/sdk/types.js";
 import { z } from "zod";
 import { PageSnapshot } from "./pageSnapshot.js";
-import type { Page, Locator } from "playwright-core"; 
+import type { Page } from "playwright-core"; 
 
 export type ToolActionResult =
   | { content?: (ImageContent | TextContent)[] }
