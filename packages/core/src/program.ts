@@ -1,4 +1,7 @@
 import { program } from 'commander';
+import * as fs from 'fs';
+import * as path from 'path';
+import { fileURLToPath } from 'url';
 
 import { createServer } from './index.js';
 import { ServerList } from './server.js';
@@ -7,7 +10,14 @@ import { startHttpTransport, startStdioTransport } from './transport.js';
 
 import { resolveConfig } from './config.js';
 
-import packageJSON from '../package.json' with { type: 'json' };
+// Determine the directory of the current module
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load package.json using fs
+const packageJSONPath = path.resolve(__dirname, '../package.json');
+const packageJSONBuffer = fs.readFileSync(packageJSONPath);
+const packageJSON = JSON.parse(packageJSONBuffer.toString());
 
 program
     .version('Version ' + packageJSON.version)
@@ -25,11 +35,7 @@ program
     .option('--browserHeight <height>', 'Browser height to use for the browser.')
     .action(async options => {
       const config = await resolveConfig(options);
-      const serverList = new ServerList(async(urlConfig) => {
-        const mergedConfig = urlConfig ? { ...config, ...urlConfig } : config;
-        return createServer(mergedConfig);
-      });
-      
+      const serverList = new ServerList(async() => createServer(config));
       setupExitWatchdog(serverList);
 
       if (options.port)
