@@ -5,7 +5,6 @@ import { z } from "zod";
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { Tool, navigate, common, snapshot, keyboard, getText, session, contextTools, Context, resolveConfig} from "@mcp/core";
 import { withMcpAuth } from "@/lib/auth";
-import { contextStore } from "@/lib/contextStore";
 
 const needAuthTools = [
   "browserbase_session_create",
@@ -13,6 +12,9 @@ const needAuthTools = [
   "browserbase_context_create",
   "browserbase_context_delete",
 ];
+
+// In mem cache won't work in prod
+const contextStore = new Map<string, Context>();
 
 const mcpServerFactory = (req: Request) => async (server: any) => {
   const tools: Tool<any>[] = [
