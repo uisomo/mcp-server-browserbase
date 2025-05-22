@@ -134,6 +134,9 @@ importers:
         specifier: ^1.49.0
         version: 1.52.0
     devDependencies:
+      '@types/dotenv':
+        specifier: ^8.2.3
+        version: 8.2.3
       shx:
         specifier: ^0.3.4
         version: 0.3.4
