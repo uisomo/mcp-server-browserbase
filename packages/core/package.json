@@ -34,6 +34,7 @@
     "@browserbasehq/sdk": "^2.5.0",
     "@modelcontextprotocol/sdk": "^1.11.3",
     "commander": "^12.0.0",
+    "dotenv": "^16.5.0",
     "playwright": "~1.52.0",
     "playwright-core": "~1.52.0",
     "yaml": "^2.3.4",
@@ -41,7 +42,6 @@
     "zod-to-json-schema": "^3.23.0"
   },
   "devDependencies": {
-    "@types/dotenv": "^8.2.3",
     "@types/node": "^20.10.4",
     "eslint": "^8.57.0",
     "shx": "^0.3.4",
