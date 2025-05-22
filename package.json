@@ -16,5 +16,8 @@
     "@types/webpack": "^5.28.5",
     "pnpm": "^8.0.0",
     "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "next": "15.2.4"
   }
 }
