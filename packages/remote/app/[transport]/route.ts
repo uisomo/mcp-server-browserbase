@@ -3,7 +3,7 @@ import { z } from "zod";
 
 // @ts-ignore
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { defineTool, navigate, common, snapshot, keyboard, getText, session, Context, resolveConfig, PageSnapshot, enableDefaultSessionCreation } from "@mcp/core";
+import { defineTool, navigate, common, snapshot, keyboard, getText, session, Context, resolveConfig, PageSnapshot } from "@mcp/core";
 import { withMcpAuth } from "@/lib/auth";
 import { loadCtx, saveCtx, type CachedResources, type CachedSnapshot, deleteCtx } from "@/lib/redis";
 
@@ -121,9 +121,7 @@ const mcpServerFactory = (req: Request) => async (server: any) => {
             if (tool.schema.name === "browserbase_session_close") {
               // Run the tool with the rehydrated context
               const result = await callContext.run(tool, params);
-              
-              // This is the important part: We delete the context from Redis
-              // to prevent accessing the default session on subsequent calls
+
               try {
                 await deleteCtx(browserbaseProjectId);
                 console.log(`Deleted cached context for ${browserbaseProjectId} after session close`);
@@ -133,13 +131,7 @@ const mcpServerFactory = (req: Request) => async (server: any) => {
               
               return result;
             }
-            // At the beginning of each new request, always re-enable session creation
-            // in case it was disabled by a previous session close operation
             else if (tool.schema.name !== "browserbase_session_close") {
-              // Re-enable default session creation for any tool that isn't session close
-              enableDefaultSessionCreation();
-              console.log(`Re-enabled default session creation for tool: ${tool.schema.name}`);
-              
               // Special handling for tools that require active snapshots to be reconnected
               if (tool.schema.name.startsWith('browserbase_') && 
                   !['browserbase_session_create', 'browserbase_session_close', 'browserbase_snapshot', 'browserbase_navigate'].includes(tool.schema.name)) {
