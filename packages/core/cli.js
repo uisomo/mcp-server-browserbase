@@ -7,14 +7,12 @@ import session from './dist/tools/session.js';
 import common from './dist/tools/common.js';
 import contextTools from './dist/tools/context.js';
 import { defineTool } from './dist/tools/tool.js';
+import { PageSnapshot } from './dist/pageSnapshot.js';
 
 import { Context } from './dist/context.js';
 import { resolveConfig, defaultConfig } from './dist/config.js';
 
-export { Context, resolveConfig, defaultConfig };
-
-// Export individual tools
-export { navigate, snapshot, keyboard, getText, session, common, contextTools, defineTool as Tool };
+export { navigate, snapshot, keyboard, getText, session, common, contextTools, defineTool, Context, PageSnapshot, resolveConfig, defaultConfig };
 
 // Run the CLI if this file is executed directly
 if (process.argv[1] === new URL(import.meta.url).pathname) {

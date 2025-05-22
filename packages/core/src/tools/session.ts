@@ -42,7 +42,8 @@ async function handleCreateSession(
       let targetSessionId: string;
 
       if (params.sessionId) {
-        targetSessionId = params.sessionId;
+        const projectId = config.browserbaseProjectId || '';
+        targetSessionId = `${params.sessionId}_${projectId}`;
         process.stderr.write(
           `[tool.createSession] Attempting to create/assign session with specified ID: ${targetSessionId}`
         );
@@ -203,7 +204,7 @@ async function handleCloseSession(
     if (browserClosedSuccessfully) { // Browser was present and closed
       let successMessage = `Browserbase session (associated with context ID ${previousSessionId || 'default'}) closed successfully. Context reset to default.`;
       if (previousSessionId && previousSessionId !== defaultSessionId) {
-        successMessage += ` If this was a uniquely named session (${previousSessionId}), view replay (if available) at https://browserbase.com/sessions/${previousSessionId}`;
+        successMessage += ` If this was a uniquely named session (${previousSessionId}), view replay (if available) at https://browserbase.com/sessions`;
       }
       return { content: [{ type: "text", text: successMessage }] };
     }

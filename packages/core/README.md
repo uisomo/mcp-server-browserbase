@@ -115,8 +115,7 @@ The Browserbase MCP server accepts the following command-line flags:
 These flags can be passed directly to the CLI or configured in your MCP configuration file.
 
 ### NOTE: 
-
-Currently, these flags can only be used with the local server (npx @browserbasehq/mcp). 
+Currently, these flags work with both the npx command (@browserbasehq/mcp) and when running the local server directly.
 
 ____
 

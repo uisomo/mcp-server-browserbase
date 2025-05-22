@@ -6,6 +6,7 @@ type PageOrFrameLocator = Page | FrameLocator;
 export class PageSnapshot {
   private _frameLocators: PageOrFrameLocator[] = [];
   private _text!: string;
+  private _isDisconnected: boolean = false; // Whether the snapshot is disconnected (deserialized from cache)
 
   constructor() {
   }
@@ -13,7 +14,49 @@ export class PageSnapshot {
   static async create(page: Page): Promise<PageSnapshot> {
     const snapshot = new PageSnapshot();
     await snapshot._build(page);
+    snapshot._frameLocators = [page]; // Store the page as the first frame locator
     return snapshot;
+  }
+
+  // Create a new method to serialize the snapshot for storage
+  serialize(): string {
+    return JSON.stringify({
+      text: this._text
+    });
+  }
+
+  // Create a static method to deserialize a stored snapshot
+  static fromSerialized(serializedData: string): PageSnapshot | null {
+    try {
+      const data = JSON.parse(serializedData);
+      if (!data || typeof data.text !== 'string') {
+        return null;
+      }
+
+      const snapshot = new PageSnapshot();
+      snapshot._text = data.text;
+      snapshot._isDisconnected = true; // Mark as disconnected since it doesn't have frameLocators
+      return snapshot;
+    } catch (e) {
+      console.error('Failed to deserialize PageSnapshot:', e);
+      return null;
+    }
+  }
+
+  /**
+   * Reconnect a deserialized snapshot to a live browser page
+   * This must be called before using refLocator on a deserialized snapshot
+   */
+  reconnect(page: Page): void {
+    this._frameLocators = [page]; // Set the page as the first frame locator
+    this._isDisconnected = false; // Mark as connected
+  }
+
+  /**
+   * Check if this snapshot needs reconnection
+   */
+  needsReconnection(): boolean {
+    return this._isDisconnected || this._frameLocators.length === 0;
   }
 
   text(): string {
@@ -95,14 +138,18 @@ export class PageSnapshot {
       targetRef = match[2];
     }
 
-    if (this._frameLocators.length === 0) {
-        throw new Error(`Frame locators not initialized. Cannot find frame for ref '${ref}'.`);
+    if (this._isDisconnected) {
+      throw new Error(`Snapshot is disconnected. Call reconnect() with a live page before using refLocator.`);
     }
 
-     if (frameIndex < 0 || frameIndex >= this._frameLocators.length) {
-        throw new Error(`Validation Error: Frame index ${frameIndex} derived from ref '${ref}' is out of bounds (found ${this._frameLocators.length} frames).`);
-     }
-     frame = this._frameLocators[frameIndex];
+    if (this._frameLocators.length === 0) {
+      throw new Error(`Frame locators not initialized. Cannot find frame for ref '${ref}'.`);
+    }
+
+    if (frameIndex < 0 || frameIndex >= this._frameLocators.length) {
+      throw new Error(`Validation Error: Frame index ${frameIndex} derived from ref '${ref}' is out of bounds (found ${this._frameLocators.length} frames).`);
+    }
+    frame = this._frameLocators[frameIndex];
 
     if (!frame)
       throw new Error(`Frame (index ${frameIndex}) could not be determined. Provide ref from the most current snapshot.`);
