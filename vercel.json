@@ -1,0 +1,6 @@
+{
+  "buildCommand": "cd packages/remote && pnpm build",
+  "outputDirectory": "packages/remote/.next",
+  "devCommand": "cd packages/remote && pnpm dev",
+  "installCommand": "pnpm install"
+} 
