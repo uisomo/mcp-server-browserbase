@@ -18,7 +18,7 @@ const waitSchema: ToolSchema<typeof WaitInputSchema> = {
 };
 
 // Handle function for Wait
-async function handleWait(context: Context, params: WaitInput): Promise<ToolResult> { // Uses Context, returns ToolResult
+async function handleWait(context: Context, params: WaitInput): Promise<ToolResult> { 
     const action = async (): Promise<ToolActionResult> => {
         await new Promise(resolve => setTimeout(resolve, params.time * 1000));
         return { content: [{ type: 'text', text: `Waited for ${params.time} seconds.` }] };
@@ -28,7 +28,7 @@ async function handleWait(context: Context, params: WaitInput): Promise<ToolResu
 
 // Define tool using handle
 const waitTool: Tool<typeof WaitInputSchema> = {
-    capability: 'core', // Add capability
+    capability: 'core', 
     schema: waitSchema,
     handle: handleWait,
 };
@@ -36,7 +36,7 @@ const waitTool: Tool<typeof WaitInputSchema> = {
 
 // --- Tool: Close ---
 const CloseInputSchema = z.object({
-    random_string: z.string().optional().describe("Dummy parameter") // Keep schema if needed
+    random_string: z.string().optional().describe("Dummy parameter") 
 });
 type CloseInput = z.infer<typeof CloseInputSchema>;
 
